@@ -50,14 +50,21 @@ d3.csv("data.csv").then(function(data) {
 
 			// y is customized by input variables
 			y = d3.scaleLinear()
-			//.domain([d3.min(data, d => (Number(d[ind_var])-0.02)), d3.max(data, d => (Number(d[ind_var])+0.1))]).nice()
-			.domain([0, d3.max(data, d => (Number(d[ind_var])+0.1))]).nice()
 			.range([height - margin.bottom, margin.top]);
+
+			var yAxisSet1 = d3.axisLeft(y), yAxisSet2;
+			if (d3.max(data, d => (Number(d[ind_var]))) < 1 ) {
+				yAxisSet2 = yAxisSet1.tickFormat(d3.format(".0%"));
+				y.domain([0, d3.max(data, d => (Number(d[ind_var])+0.1))]).nice();
+			} else {
+				yAxisSet2 = yAxisSet1;
+				y.domain([d3.min(data, d => (Number(d[ind_var])-0.02)), d3.max(data, d => (Number(d[ind_var])+0.1))]).nice();
+			};
 
 			// Add the y-axis.
 			yAxis = g => g
 			.attr("transform", `translate(${margin.left},0)`)
-			.call(d3.axisLeft(y).tickFormat(d3.format(".0%")))
+			.call(yAxisSet2) 
 			.call(g => g.select(".domain").remove())
 			.call(g => g.selectAll(".tick line")
 				.filter(d => d === 0)
@@ -72,7 +79,7 @@ d3.csv("data.csv").then(function(data) {
 				.attr("text-anchor", "start")
 				.attr("font-weight", "bold")
 				.text(ind_var))
-
+			
 			svg.append("g")
 			.call(xAxis);
 
@@ -148,5 +155,5 @@ d3.csv("data.csv").then(function(data) {
 
 		//return svg.node();
 	}
-	draw_scp("vote14", "college_p", "divorce_p"); 
+	draw_scp("vote14", "college_p", "divorce_p", "median_age", "avg_age"); 
 });
